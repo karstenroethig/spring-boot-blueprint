@@ -1,0 +1,49 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout-auth :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'auth'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{auth.login.title})}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<h4 class="card-title mt-1 mb-3 text-center" th:text="#{auth.login.title}">Log In to Your Account</h4>
+
+		<p class="text-danger text-center" th:if="${authMsg}"><small th:text="${authMsg}">[authMsg]</small></p>
+
+		<form th:action="@{/auth/login}" method="post" autocomplete="off">
+			<div>
+				<input type="text" class="form-control" name="username" id="username" th:placeholder="#{auth.login.email.label}" placeholder="E-mail address">
+			</div>
+			<div class="mt-3">
+				<input type="password" class="form-control" name="password" id="password" th:placeholder="#{auth.login.password.label}" placeholder="Password">
+			</div>
+			<div class="mt-3">
+				<a th:href="@{/auth/reset-password}"><small th:text="#{auth.login.forgotPassword.link}">Forgot password?</small></a>
+			</div>
+			<div class="mt-3">
+				<button type="submit" class="btn btn-primary form-control" th:text=#{auth.login.button}>Log In</button>
+			</div>
+		</form>
+
+		<div class="mt-5 text-center">
+			<span th:text="#{auth.login.registration.question}">Don't have an account?</span>
+			<a th:href="@{/auth/registration}" th:text="#{auth.login.registration.link}">Sign Up</a>
+		</div>
+
+	</div>
+
+	<th:block id="additionalJs">
+		<script th:src="@{/js/auth/login.js}"></script>
+	</th:block>
+
+</body>
+</html>

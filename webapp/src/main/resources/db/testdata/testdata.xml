@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<!-- =========== -->
+	<!-- insert data -->
+	<!-- =========== -->
+	<changeSet id="test" author="roethig">
+
+		<loadData tableName="authority" file="db/testdata/authorities.csv" separator=";"></loadData>
+
+		<insert tableName="user">
+			<column name="email"                 value="admin"/>
+			<column name="hashed_password"       value="{bcrypt}$2a$10$xYan6XpTOv0XztWwuVkxL.9qqTYLH4QrDDRAqjAmDhqIMA1n7ywVO"/>
+			<column name="full_name"             value="Administrator"/>
+			<column name="enabled"               valueBoolean="true"/>
+			<column name="locked"                valueBoolean="false"/>
+			<column name="failed_login_attempts" valueNumeric="0"/>
+			<column name="deleted"               valueBoolean="false"/>
+		</insert>
+
+		<insert tableName="user_authority">
+			<column name="user_id"      valueNumeric="select id from user where email='admin'"/>
+			<column name="authority_id" valueNumeric="select id from authority where name='ROLE_USER'"/>
+		</insert>
+
+		<insert tableName="user_authority">
+			<column name="user_id"      valueNumeric="select id from user where email='admin'"/>
+			<column name="authority_id" valueNumeric="select id from authority where name='ROLE_ADMIN'"/>
+		</insert>
+
+	</changeSet>
+
+</databaseChangeLog>

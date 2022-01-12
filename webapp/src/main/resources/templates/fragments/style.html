@@ -1,0 +1,29 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+</head>
+<body>
+
+	<th:block th:fragment="style-fragment">
+
+		<!-- Font Awesome -->
+		<link rel="stylesheet" th:href="@{'/webjars/font-awesome/css/all.min.css'}"/>
+
+		<!-- selectize.js -->
+		<link rel="stylesheet" th:href="@{'/webjars/selectize.js/css/selectize.bootstrap4.css'}"/>
+
+		<!-- Summernote -->
+		<link rel="stylesheet" th:href="@{'/webjars/summernote/summernote-bs4.css'}"/>
+
+		<!-- Bootswatch Cosmo -->
+		<link rel="stylesheet" th:href="@{'/webjars/bootswatch-cosmo/bootstrap.min.css'}"/>
+
+		<!-- App style -->
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+
+	</th:block>
+
+</body>
+</html>

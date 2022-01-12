@@ -1,0 +1,77 @@
+#
+# Spring Boot configuration
+#  - options: https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+#
+
+spring:
+
+  jpa:
+    databasePlatform: org.hibernate.dialect.H2Dialect
+    # Open Session In View (see https://www.baeldung.com/spring-open-session-in-view)
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+
+  datasource:
+    url: jdbc:h2:mem:paperless-db
+    username: paperless_user
+    password: paperless_password
+    # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 30000
+      maxLifetime: 2000000
+      minimumIdle: 3
+      maximumPoolSize: 5
+      poolName: SpringBootHikariCP
+
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /css/**, /images/**, /js/**
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml
+
+  main:
+    allow-circular-references: true
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+---
+
+spring:
+
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: false
+
+  h2:
+    console:
+      enabled: false # accessible via http://localhost:8080/h2-console
+
+  thymeleaf:
+    # Reload templates without restarting the container
+    cache: false
+
+  liquibase:
+    change-log: classpath:/db/changelog/master-dev.xml
+
+server:
+  # Server only listens to localhost
+  address: 127.0.0.1

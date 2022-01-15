@@ -14,6 +14,8 @@ public enum ViewEnum
 	AUTH_REGISTRATION_CONFIRM_PENDING(ControllerEnum.AUTH, "/registration-confirm-pending"),
 	AUTH_REGISTRATION_CONFIRM_SUCCESS(ControllerEnum.AUTH, "/registration-confirm-success"),
 	AUTH_REGISTRATION_CONFIRM_EXPIRED(ControllerEnum.AUTH, "/registration-confirm-expired"),
+	AUTH_RESET_PASSWORD(ControllerEnum.AUTH, "/reset-password"),
+	AUTH_RESET_PASSWORD_SUCCESS(ControllerEnum.AUTH, "/reset-password-success"),
 
 	DASHBOARD("/dashboard"),
 

@@ -12,8 +12,11 @@ public enum MessageKeyEnum
 	COMMON_VALIDATION_ALREADY_EXISTS("common.validation.alreadyExists"),
 
 	AUTH_REGISTRATION_SAVE_ERROR("auth.registration.save.error"),
+	AUTH_RESET_PASSWORD_SEND_MAIL_ERROR("auth.resetPassword.sendMail.error"),
+	AUTH_RESET_PASSWORD_SEND_MAIL_ERROR_EMAIL_NOT_FOUND("auth.resetPassword.sendMail.error.emailNotFound"),
 
 	MAIL_REGISTRATION_CONFIM_SUBJECT("mail.registrationConfirm.subject"),
+	MAIL_CHANGE_PASSWORD_SUBJECT("mail.changePassword.subject"),
 
 	// --------
 

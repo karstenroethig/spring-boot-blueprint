@@ -3,7 +3,8 @@ package karstenroethig.springbootblueprint.webapp.util.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.micrometer.core.instrument.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import lombok.Getter;
 

@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class VerificationTokenDto
+public class PasswordResetTokenDto
 {
 	private UserDto user;
 

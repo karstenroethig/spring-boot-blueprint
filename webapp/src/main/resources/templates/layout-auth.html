@@ -34,6 +34,8 @@
 						<p class="mt-3" th:text="#{application.subtitle}">A spring boot web application as a blueprint for new projects.</p>
 					</header>
 
+					<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
 				</div>
 			</div>
 

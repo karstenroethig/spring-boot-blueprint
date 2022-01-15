@@ -39,7 +39,8 @@ public class EmailServiceImpl
 	@RequiredArgsConstructor
 	private enum MailTypeEnum
 	{
-		REGISTRATION_CONFIRM("mail/registration-confirm.html", MessageKeyEnum.MAIL_REGISTRATION_CONFIM_SUBJECT);
+		REGISTRATION_CONFIRM("mail/registration-confirm.html", MessageKeyEnum.MAIL_REGISTRATION_CONFIM_SUBJECT),
+		CHANGE_PASSWORD("mail/change-password.html", MessageKeyEnum.MAIL_CHANGE_PASSWORD_SUBJECT);
 
 		private final String template;
 		private final MessageKeyEnum subjectMessageKey;
@@ -54,7 +55,16 @@ public class EmailServiceImpl
 		sendMessageUsingTemplate(user.getEmail(), MailTypeEnum.REGISTRATION_CONFIRM, locale, templateVariables);
 	}
 
-	public void sendMessageUsingTemplate(String to, MailTypeEnum mailType, Locale locale, Map<String, Object> templateVariables) throws MessagingException
+	public void sendChangePasswordMessage(UserDto user, Locale locale, URI changePasswordUri) throws MessagingException
+	{
+		Map<String, Object> templateVariables = new HashMap<>();
+		templateVariables.put("user", user);
+		templateVariables.put("changePasswordUrl", changePasswordUri.toString());
+
+		sendMessageUsingTemplate(user.getEmail(), MailTypeEnum.CHANGE_PASSWORD, locale, templateVariables);
+	}
+
+	private void sendMessageUsingTemplate(String to, MailTypeEnum mailType, Locale locale, Map<String, Object> templateVariables) throws MessagingException
 	{
 		String subject = messageSource.getMessage(mailType.getSubjectMessageKey().getKey(), null, locale);
 

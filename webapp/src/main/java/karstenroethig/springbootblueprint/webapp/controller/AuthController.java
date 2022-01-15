@@ -35,9 +35,11 @@ import karstenroethig.springbootblueprint.webapp.controller.util.ViewEnum;
 import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserRegistrationDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserResetPasswordDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.VerificationTokenDto;
 import karstenroethig.springbootblueprint.webapp.service.impl.OldUserServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserRegistrationServiceImpl;
+import karstenroethig.springbootblueprint.webapp.service.impl.UserResetPasswordServiceImpl;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.Messages;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationResult;
@@ -51,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController extends AbstractController
 {
 	@Autowired private UserRegistrationServiceImpl userRegistrationService;
+	@Autowired private UserResetPasswordServiceImpl userResetPasswordService;
 	@Autowired private OldUserServiceImpl userService;
 
 	@GetMapping(value = "/login")
@@ -144,6 +147,40 @@ public class AuthController extends AbstractController
 		{
 			log.error("unable to confirm registration", ex);
 			throw new InternalServerErrorException("error confirming user registration", ex);
+		}
+	}
+
+	@GetMapping(value = "/reset-password")
+	public String resetPassword(Model model)
+	{
+		model.addAttribute("userResetPassword", userResetPasswordService.create());
+		return ViewEnum.AUTH_RESET_PASSWORD.getViewName();
+	}
+
+	@PostMapping(value = "/reset-password")
+	public String resetPassword(@ModelAttribute("userResetPassword") @Valid UserResetPasswordDto userResetPassword, BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes, Model model, HttpServletRequest request)
+	{
+		ValidationResult validationResult = userResetPasswordService.validate(userResetPassword);
+		if (validationResult.hasErrors())
+			addValidationMessagesToBindingResult(validationResult.getErrors(), bindingResult);
+
+		if (bindingResult.hasErrors() || validationResult.hasErrors())
+			return ViewEnum.AUTH_RESET_PASSWORD.getViewName();
+
+		try
+		{
+			Locale currentLocale = LocaleContextHolder.getLocale();
+			userResetPasswordService.sendChangePasswordMail(userResetPassword, currentLocale);
+
+			model.addAttribute("userResetPassword", userResetPassword);
+			return ViewEnum.AUTH_RESET_PASSWORD_SUCCESS.getViewName();
+		}
+		catch (Exception ex)
+		{
+			log.error("unable to send change password mail", ex);
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.AUTH_RESET_PASSWORD_SEND_MAIL_ERROR));
+			return ViewEnum.AUTH_RESET_PASSWORD.getViewName();
 		}
 	}
 

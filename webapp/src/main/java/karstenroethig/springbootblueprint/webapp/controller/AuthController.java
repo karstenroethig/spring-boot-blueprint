@@ -33,6 +33,8 @@ import karstenroethig.springbootblueprint.webapp.controller.util.AttributeNames;
 import karstenroethig.springbootblueprint.webapp.controller.util.UrlMappings;
 import karstenroethig.springbootblueprint.webapp.controller.util.ViewEnum;
 import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.PasswordResetTokenDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserChangePasswordDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserRegistrationDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserResetPasswordDto;
@@ -181,6 +183,52 @@ public class AuthController extends AbstractController
 			log.error("unable to send change password mail", ex);
 			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.AUTH_RESET_PASSWORD_SEND_MAIL_ERROR));
 			return ViewEnum.AUTH_RESET_PASSWORD.getViewName();
+		}
+	}
+
+	@GetMapping(value = "/change-password")
+	public String changePassword(Model model, @RequestParam(name = "token") String token)
+	{
+		PasswordResetTokenDto tokenDto = userResetPasswordService.findPasswordResetToken(token);
+		if (tokenDto == null)
+		{
+			delay();
+			throw new NotFoundException("token not found");
+		}
+
+		if (tokenDto.isExpired())
+		{
+			return ViewEnum.AUTH_CHANGE_PASSWORD_EXPIRED.getViewName();
+		}
+
+		model.addAttribute("userChangePassword", userResetPasswordService.create(token));
+		return ViewEnum.AUTH_CHANGE_PASSWORD.getViewName();
+	}
+
+	@PostMapping(value = "/change-password")
+	public String changePassword(@ModelAttribute("userChangePassword") @Valid UserChangePasswordDto userChangePassword, BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes, Model model, HttpServletRequest request)
+	{
+		ValidationResult validationResult = userResetPasswordService.validate(userChangePassword);
+		if (validationResult.hasErrors())
+		{
+			delay();
+			addValidationMessagesToBindingResult(validationResult.getErrors(), bindingResult);
+		}
+
+		if (bindingResult.hasErrors() || validationResult.hasErrors())
+			return ViewEnum.AUTH_CHANGE_PASSWORD.getViewName();
+
+		try
+		{
+			userResetPasswordService.saveNewPassword(userChangePassword);
+			return ViewEnum.AUTH_CHANGE_PASSWORD_SUCCESS.getViewName();
+		}
+		catch (Exception ex)
+		{
+			log.error("unable to set new password", ex);
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.AUTH_CHANGE_PASSWORD_SAVE_ERROR));
+			return ViewEnum.AUTH_CHANGE_PASSWORD.getViewName();
 		}
 	}
 

@@ -14,6 +14,9 @@ public enum MessageKeyEnum
 	AUTH_REGISTRATION_SAVE_ERROR("auth.registration.save.error"),
 	AUTH_RESET_PASSWORD_SEND_MAIL_ERROR("auth.resetPassword.sendMail.error"),
 	AUTH_RESET_PASSWORD_SEND_MAIL_ERROR_EMAIL_NOT_FOUND("auth.resetPassword.sendMail.error.emailNotFound"),
+	AUTH_CHANGE_PASSWORD_SAVE_ERROR("auth.changePassword.save.error"),
+	AUTH_CHANGE_PASSWORD_SAVE_ERROR_TOKEN_UNKNOWN("auth.changePassword.save.error.tokenUnknown"),
+	AUTH_CHANGE_PASSWORD_SAVE_ERROR_TOKEN_EXPIRED("auth.changePassword.save.error.tokenExpired"),
 
 	MAIL_REGISTRATION_CONFIM_SUBJECT("mail.registrationConfirm.subject"),
 	MAIL_CHANGE_PASSWORD_SUBJECT("mail.changePassword.subject"),

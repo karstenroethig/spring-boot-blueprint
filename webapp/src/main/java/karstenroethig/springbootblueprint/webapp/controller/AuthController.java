@@ -33,15 +33,15 @@ import karstenroethig.springbootblueprint.webapp.controller.util.AttributeNames;
 import karstenroethig.springbootblueprint.webapp.controller.util.UrlMappings;
 import karstenroethig.springbootblueprint.webapp.controller.util.ViewEnum;
 import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
-import karstenroethig.springbootblueprint.webapp.model.dto.auth.PasswordResetTokenDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserChangePasswordDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserRegistrationDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserResetPasswordDto;
-import karstenroethig.springbootblueprint.webapp.model.dto.auth.VerificationTokenDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserTokenDto;
 import karstenroethig.springbootblueprint.webapp.service.impl.OldUserServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserRegistrationServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserResetPasswordServiceImpl;
+import karstenroethig.springbootblueprint.webapp.service.impl.UserTokenServiceImpl;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.Messages;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationResult;
@@ -56,6 +56,7 @@ public class AuthController extends AbstractController
 {
 	@Autowired private UserRegistrationServiceImpl userRegistrationService;
 	@Autowired private UserResetPasswordServiceImpl userResetPasswordService;
+	@Autowired private UserTokenServiceImpl userTokenService;
 	@Autowired private OldUserServiceImpl userService;
 
 	@GetMapping(value = "/login")
@@ -125,7 +126,7 @@ public class AuthController extends AbstractController
 	@GetMapping(value = "/registration-confirm")
 	public String registrationConfirm(Model model, @RequestParam(name = "token") String token)
 	{
-		VerificationTokenDto tokenDto = userRegistrationService.findVerifikationToken(token);
+		UserTokenDto tokenDto = userTokenService.findRegistrationConfirmToken(token);
 		if (tokenDto == null)
 		{
 			delay();
@@ -189,7 +190,7 @@ public class AuthController extends AbstractController
 	@GetMapping(value = "/change-password")
 	public String changePassword(Model model, @RequestParam(name = "token") String token)
 	{
-		PasswordResetTokenDto tokenDto = userResetPasswordService.findPasswordResetToken(token);
+		UserTokenDto tokenDto = userTokenService.findChangePasswordToken(token);
 		if (tokenDto == null)
 		{
 			delay();

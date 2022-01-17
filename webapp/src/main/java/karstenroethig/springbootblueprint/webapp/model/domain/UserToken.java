@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -11,6 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
+import karstenroethig.springbootblueprint.webapp.model.enums.UserTokenTypeEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,9 +27,13 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 
 @Entity
-@Table(name = "verification_token")
-public class VerificationToken extends AbstractEntityId
+@Table(name = "user_token")
+public class UserToken extends AbstractEntityId
 {
+	@Column(name = "type", length = 191, nullable = false)
+	@Enumerated(EnumType.STRING)
+	private UserTokenTypeEnum type;
+
 	@OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
 	@JoinColumn(nullable = false, name = "user_id")
 	private User user;

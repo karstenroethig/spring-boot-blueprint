@@ -81,12 +81,15 @@
 			referencedTableName="authority" referencedColumnNames="id"
 			constraintName="fk_user_authority__authority_id__authority"/>
 
-		<!-- ========================== -->
-		<!-- Table "verification_token" -->
-		<!-- ========================== -->
-		<createTable tableName="verification_token">
+		<!-- ================== -->
+		<!-- Table "user_token" -->
+		<!-- ================== -->
+		<createTable tableName="user_token">
 			<column name="id" type="${type.id}" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="type" type="varchar(191)">
+				<constraints nullable="false"/>
 			</column>
 			<column name="user_id" type="${type.idRef}">
 				<constraints nullable="false"/>
@@ -100,32 +103,9 @@
 		</createTable>
 
 		<addForeignKeyConstraint
-			baseTableName="verification_token" baseColumnNames="user_id"
+			baseTableName="user_token" baseColumnNames="user_id"
 			referencedTableName="user" referencedColumnNames="id"
-			constraintName="fk_verification_token__user_id__user"/>
-
-		<!-- ============================ -->
-		<!-- Table "password_reset_token" -->
-		<!-- ============================ -->
-		<createTable tableName="password_reset_token">
-			<column name="id" type="${type.id}" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="user_id" type="${type.idRef}">
-				<constraints nullable="false"/>
-			</column>
-			<column name="token" type="varchar(191)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="expired_datetime" type="datetime">
-				<constraints nullable="false"/>
-			</column>
-		</createTable>
-
-		<addForeignKeyConstraint
-			baseTableName="password_reset_token" baseColumnNames="user_id"
-			referencedTableName="user" referencedColumnNames="id"
-			constraintName="fk_password_reset_token__user_id__user"/>
+			constraintName="fk_user_token__user_id__user"/>
 
 	</changeSet>
 

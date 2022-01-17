@@ -1,9 +1,7 @@
 package karstenroethig.springbootblueprint.webapp.service.impl;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -14,13 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import karstenroethig.springbootblueprint.webapp.config.ApplicationProperties;
-import karstenroethig.springbootblueprint.webapp.model.domain.PasswordResetToken;
 import karstenroethig.springbootblueprint.webapp.model.domain.User;
-import karstenroethig.springbootblueprint.webapp.model.dto.auth.PasswordResetTokenDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserChangePasswordDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserResetPasswordDto;
-import karstenroethig.springbootblueprint.webapp.repository.PasswordResetTokenRepository;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserTokenDto;
 import karstenroethig.springbootblueprint.webapp.repository.UserRepository;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationException;
@@ -34,11 +30,11 @@ public class UserResetPasswordServiceImpl
 
 	@Autowired private OldUserServiceImpl userService;
 	@Autowired private EmailServiceImpl emailService;
+	@Autowired private UserTokenServiceImpl userTokenService;
 
 	@Autowired private PasswordEncoder passwordEncoder;
 
 	@Autowired private UserRepository userRepository;
-	@Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
 	public UserResetPasswordDto create()
 	{
@@ -83,45 +79,17 @@ public class UserResetPasswordServiceImpl
 		checkValidation(userResetPassword);
 
 		User user = userRepository.findOneByEmailIgnoreCase(userResetPassword.getEmail()).orElseThrow();
-		String token = UUID.randomUUID().toString();
+		UserDto userDto = userService.transform(user);
 
-		PasswordResetToken passwordResetToken = new PasswordResetToken();
-		passwordResetToken.setUser(user);
-		passwordResetToken.setToken(token);
-		passwordResetToken.setExpiredDatetime(LocalDateTime.now().plusDays(1l));
-
-		passwordResetTokenRepository.save(passwordResetToken);
+		UserTokenDto changePasswordToken = userTokenService.createChangePasswordToken(userDto);
 
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(applicationProperties.getBaseUrl());
 		uriBuilder.path("/auth/change-password");
-		uriBuilder.queryParam("token", token);
+		uriBuilder.queryParam("token", changePasswordToken.getToken());
 
 		URI changePasswordUri = uriBuilder.build().toUri();
-		UserDto userDto = userService.transform(user);
 
 		emailService.sendChangePasswordMessage(userDto, locale, changePasswordUri);
-	}
-
-	public PasswordResetTokenDto findPasswordResetToken(String token)
-	{
-		if (token == null)
-			return null;
-
-		PasswordResetToken passwordResetToken = passwordResetTokenRepository.findOneByToken(token).orElse(null);
-		if (passwordResetToken == null)
-			return null;
-
-		return transform(passwordResetToken);
-	}
-
-	private PasswordResetTokenDto transform(PasswordResetToken token)
-	{
-		PasswordResetTokenDto tokenDto = new PasswordResetTokenDto();
-		tokenDto.setUser(userService.transform(token.getUser()));
-		tokenDto.setToken(token.getToken());
-		tokenDto.setExpiredDatetime(token.getExpiredDatetime());
-
-		return tokenDto;
 	}
 
 	public UserChangePasswordDto create(String token)
@@ -157,10 +125,10 @@ public class UserResetPasswordServiceImpl
 	{
 		ValidationResult result = new ValidationResult();
 
-		PasswordResetTokenDto passwordResetToken = findPasswordResetToken(userChangePassword.getToken());
-		if (passwordResetToken == null)
+		UserTokenDto changePasswordToken = userTokenService.findChangePasswordToken(userChangePassword.getToken());
+		if (changePasswordToken == null)
 			result.addError("token", MessageKeyEnum.AUTH_CHANGE_PASSWORD_SAVE_ERROR_TOKEN_UNKNOWN);
-		else if (passwordResetToken.isExpired())
+		else if (changePasswordToken.isExpired())
 			result.addError("token", MessageKeyEnum.AUTH_CHANGE_PASSWORD_SAVE_ERROR_TOKEN_EXPIRED);
 
 		return result;
@@ -170,12 +138,12 @@ public class UserResetPasswordServiceImpl
 	{
 		checkValidation(userChangePassword);
 
-		PasswordResetToken passwordResetToken = passwordResetTokenRepository.findOneByToken(userChangePassword.getToken()).orElseThrow();
-		User user = passwordResetToken.getUser();
+		UserTokenDto changePasswordToken = userTokenService.findChangePasswordToken(userChangePassword.getToken());
+		User user = userRepository.findById(changePasswordToken.getUser().getId()).orElseThrow();
 
 		user.setHashedPassword(passwordEncoder.encode(userChangePassword.getPassword()));
 		userRepository.save(user);
 
-		passwordResetTokenRepository.deleteByUser(user);
+		userTokenService.deleteChangePasswordToken(changePasswordToken.getUser());
 	}
 }

@@ -1,9 +1,7 @@
 package karstenroethig.springbootblueprint.webapp.service.impl;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -15,12 +13,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import karstenroethig.springbootblueprint.webapp.config.ApplicationProperties;
 import karstenroethig.springbootblueprint.webapp.model.domain.User;
-import karstenroethig.springbootblueprint.webapp.model.domain.VerificationToken;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserRegistrationDto;
-import karstenroethig.springbootblueprint.webapp.model.dto.auth.VerificationTokenDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserTokenDto;
 import karstenroethig.springbootblueprint.webapp.repository.UserRepository;
-import karstenroethig.springbootblueprint.webapp.repository.VerificationTokenRepository;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationException;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationResult;
@@ -33,11 +29,11 @@ public class UserRegistrationServiceImpl
 
 	@Autowired private OldUserServiceImpl userService;
 	@Autowired private EmailServiceImpl emailService;
+	@Autowired private UserTokenServiceImpl userTokenService;
 
 	@Autowired private PasswordEncoder passwordEncoder;
 
 	@Autowired private UserRepository userRepository;
-	@Autowired private VerificationTokenRepository verificationTokenRepository;
 
 	public UserRegistrationDto create()
 	{
@@ -95,19 +91,11 @@ public class UserRegistrationServiceImpl
 
 	public void sendRegistrationConfirmMail(UserDto userDto, Locale locale) throws MessagingException
 	{
-		User user = userRepository.findById(userDto.getId()).orElseThrow();
-		String token = UUID.randomUUID().toString();
-
-		VerificationToken verificationToken = new VerificationToken();
-		verificationToken.setUser(user);
-		verificationToken.setToken(token);
-		verificationToken.setExpiredDatetime(LocalDateTime.now().plusDays(1l));
-
-		verificationTokenRepository.save(verificationToken);
+		UserTokenDto registrationConfirmToken = userTokenService.createRegistrationConfirmToken(userDto);
 
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(applicationProperties.getBaseUrl());
 		uriBuilder.path("/auth/registration-confirm");
-		uriBuilder.queryParam("token", token);
+		uriBuilder.queryParam("token", registrationConfirmToken.getToken());
 
 		URI registrationConfirmUri = uriBuilder.build().toUri();
 
@@ -122,43 +110,21 @@ public class UserRegistrationServiceImpl
 		sendRegistrationConfirmMail(userDto, locale);
 	}
 
-	public VerificationTokenDto findVerifikationToken(String token)
-	{
-		if (token == null)
-			return null;
-
-		VerificationToken verificationToken = verificationTokenRepository.findOneByToken(token).orElse(null);
-		if (verificationToken == null)
-			return null;
-
-		return transform(verificationToken);
-	}
-
 	public boolean activateUser(String token)
 	{
-		VerificationTokenDto verificationToken = findVerifikationToken(token);
-		if (verificationToken == null || verificationToken.isExpired())
+		UserTokenDto registrationConfirmToken = userTokenService.findRegistrationConfirmToken(token);
+		if (registrationConfirmToken == null || registrationConfirmToken.isExpired())
 			return false;
 
-		User user = userRepository.findById(verificationToken.getUser().getId()).orElse(null);
+		User user = userRepository.findById(registrationConfirmToken.getUser().getId()).orElse(null);
 		if (user == null)
 			return false;
 
 		user.setEnabled(true);
 		userRepository.save(user);
 
-		verificationTokenRepository.deleteByUser(user);
+		userTokenService.deleteRegistrationConfirmToken(registrationConfirmToken.getUser());
 
 		return true;
-	}
-
-	private VerificationTokenDto transform(VerificationToken token)
-	{
-		VerificationTokenDto tokenDto = new VerificationTokenDto();
-		tokenDto.setUser(userService.transform(token.getUser()));
-		tokenDto.setToken(token.getToken());
-		tokenDto.setExpiredDatetime(token.getExpiredDatetime());
-
-		return tokenDto;
 	}
 }

@@ -9,18 +9,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
-import karstenroethig.springbootblueprint.webapp.service.impl.UserAdminServiceImpl;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
+import karstenroethig.springbootblueprint.webapp.service.impl.UserServiceImpl;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CurrentUserSessionBean
 {
-	@Autowired private UserAdminServiceImpl userService;
+	@Autowired private UserServiceImpl userService;
 
-	private OldUserDto currentUser;
+	private UserDto currentUser;
 
-	public OldUserDto getCurrentUser()
+	public UserDto getCurrentUser()
 	{
 		if (currentUser == null)
 		{

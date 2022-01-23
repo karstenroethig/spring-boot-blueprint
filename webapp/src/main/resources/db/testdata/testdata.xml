@@ -25,12 +25,17 @@
 
 		<insert tableName="user_authority">
 			<column name="user_id"      valueNumeric="select id from user where email='admin'"/>
-			<column name="authority_id" valueNumeric="select id from authority where name='ROLE_USER'"/>
+			<column name="authority_id" valueNumeric="select id from authority where name='ROLE_ADMIN'"/>
 		</insert>
 
-		<insert tableName="user_authority">
-			<column name="user_id"      valueNumeric="select id from user where email='admin'"/>
-			<column name="authority_id" valueNumeric="select id from authority where name='ROLE_ADMIN'"/>
+		<insert tableName="user">
+			<column name="email"                 value="user"/>
+			<column name="hashed_password"       value="{bcrypt}$2a$10$ZSK6ZHwSSXugXKkulhy3dOl.FVh9C2zcjcIOgEPc8IRZtVusIDmpi"/>
+			<column name="full_name"             value="User"/>
+			<column name="enabled"               valueBoolean="true"/>
+			<column name="locked"                valueBoolean="false"/>
+			<column name="failed_login_attempts" valueNumeric="0"/>
+			<column name="deleted"               valueBoolean="false"/>
 		</insert>
 
 	</changeSet>

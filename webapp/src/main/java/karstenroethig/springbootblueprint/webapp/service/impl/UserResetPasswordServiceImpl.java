@@ -28,7 +28,7 @@ public class UserResetPasswordServiceImpl
 {
 	@Autowired private ApplicationProperties applicationProperties;
 
-	@Autowired private OldUserServiceImpl userService;
+	@Autowired private UserServiceImpl userService;
 	@Autowired private EmailServiceImpl emailService;
 	@Autowired private UserTokenServiceImpl userTokenService;
 

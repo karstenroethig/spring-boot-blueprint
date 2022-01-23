@@ -20,7 +20,7 @@ import karstenroethig.springbootblueprint.webapp.repository.UserTokenRepository;
 @Transactional
 public class UserTokenServiceImpl
 {
-	@Autowired private OldUserServiceImpl userService;
+	@Autowired private UserServiceImpl userService;
 
 	@Autowired private UserRepository userRepository;
 	@Autowired private UserTokenRepository userTokenRepository;

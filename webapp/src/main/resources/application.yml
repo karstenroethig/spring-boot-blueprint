@@ -13,9 +13,9 @@ spring:
       ddl-auto: none
 
   datasource:
-    url: jdbc:h2:mem:paperless-db
-    username: paperless_user
-    password: paperless_password
+    url: jdbc:h2:mem:spring-boot-blueprint-db
+    username: spring-boot-blueprint_user
+    password: spring-boot-blueprint_password
     # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
     hikari:
       connectionTimeout: 30000

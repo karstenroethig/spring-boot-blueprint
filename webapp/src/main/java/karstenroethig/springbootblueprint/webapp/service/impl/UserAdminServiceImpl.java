@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
-public class UserAdminServiceImpl extends OldUserServiceImpl
+public class UserAdminServiceImpl extends UserServiceImpl
 {
 	private static final int MAX_FAILED_LOGIN_ATTEMPTS = 3;
 
@@ -118,19 +118,6 @@ public class UserAdminServiceImpl extends OldUserServiceImpl
 		}
 
 		return user;
-	}
-
-	private Authority findOrCreateAuthority(String name)
-	{
-		Authority authority = authorityRepository.findOneByNameIgnoreCase(name).orElse(null);
-
-		if (authority != null)
-			return authority;
-
-		authority = new Authority();
-		authority.setName(name);
-
-		return authorityRepository.save(authority);
 	}
 
 	public void incrementFailedLoginAttempts(String username)

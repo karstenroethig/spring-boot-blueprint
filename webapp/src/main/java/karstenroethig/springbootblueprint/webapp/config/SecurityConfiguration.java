@@ -31,10 +31,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 	public static class Authorities
 	{
 		public static final String ADMIN = "ROLE_ADMIN";
-		public static final String USER = "ROLE_USER";
+//		public static final String USER = "ROLE_USER";
 
 		public static final List<String> ALL_AUTHORITIES = Collections.unmodifiableList(
-				Stream.of(USER, ADMIN).collect(Collectors.toList()));
+				Stream.of(/* USER,*/ ADMIN).collect(Collectors.toList()));
 
 		private Authorities() {}
 	}
@@ -79,8 +79,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 					"/admin/**",
 					"/user-admin/**")
 				.hasAnyAuthority(Authorities.ADMIN)
-			.anyRequest().hasAnyAuthority(Authorities.USER, Authorities.ADMIN);
-//			.anyRequest().authenticated();
+//			.anyRequest().hasAnyAuthority(Authorities.USER, Authorities.ADMIN);
+			.anyRequest().authenticated();
 	}
 
 	@Override

@@ -26,46 +26,20 @@ import karstenroethig.springbootblueprint.webapp.controller.util.AttributeNames;
 import karstenroethig.springbootblueprint.webapp.controller.util.UrlMappings;
 import karstenroethig.springbootblueprint.webapp.controller.util.ViewEnum;
 import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
-import karstenroethig.springbootblueprint.webapp.service.impl.OldUserServiceImpl;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
+import karstenroethig.springbootblueprint.webapp.service.impl.UserServiceImpl;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.Messages;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationResult;
 
 @ComponentScan
 @Controller
-@RequestMapping
+@RequestMapping(UrlMappings.CONTROLLER_USER)
 public class UserController extends AbstractController
 {
-	@Autowired private OldUserServiceImpl userService;
+	@Autowired private UserServiceImpl userService;
 
-	@GetMapping(value = "/register")
-	public String register(Model model)
-	{
-		model.addAttribute(AttributeNames.USER, userService.create());
-		addBasicAttributes(model);
-		return ViewEnum.USER_REGISTER.getViewName();
-	}
-
-	@PostMapping(value = "/register")
-	public String register(@ModelAttribute(AttributeNames.USER) @Valid OldUserDto user, BindingResult bindingResult,
-		final RedirectAttributes redirectAttributes, Model model)
-	{
-		if (!validate(user, bindingResult))
-		{
-			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.USER_SAVE_INVALID));
-			addBasicAttributes(model);
-			return ViewEnum.USER_REGISTER.getViewName();
-		}
-
-		if (userService.save(user) != null)
-			return ViewEnum.USER_REGISTER_SUCCESS.getViewName();
-
-		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.USER_SAVE_ERROR));
-		addBasicAttributes(model);
-		return ViewEnum.USER_REGISTER.getViewName();
-	}
-
-	@GetMapping(value = UrlMappings.CONTROLLER_USER + "/show")
+	@GetMapping(value = "/show")
 	public String show(Model model)
 	{
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -73,7 +47,7 @@ public class UserController extends AbstractController
 			throw new NotFoundException("user not found");
 
 		String username = authentication.getName();
-		OldUserDto user = userService.find(username);
+		UserDto user = userService.find(username);
 		if (user == null)
 			throw new NotFoundException(username);
 
@@ -85,11 +59,13 @@ public class UserController extends AbstractController
 		return ViewEnum.USER_SHOW.getViewName();
 	}
 
+	// FIXME: Deprecated at this point
+
 	@GetMapping(value = UrlMappings.CONTROLLER_USER + "/edit")
 	public String edit(Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto user = userService.find(username);
+		OldUserDto user = userService.findOld(username);
 		if (user == null)
 			throw new NotFoundException(username);
 
@@ -103,7 +79,7 @@ public class UserController extends AbstractController
 		final RedirectAttributes redirectAttributes, Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto currentUser = userService.find(username);
+		OldUserDto currentUser = userService.findOld(username);
 		if (currentUser == null)
 			throw new NotFoundException(username);
 		user.setId(currentUser.getId());
@@ -131,7 +107,7 @@ public class UserController extends AbstractController
 	public String delete(final RedirectAttributes redirectAttributes, Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto user = userService.find(username);
+		OldUserDto user = userService.findOld(username);
 		if (user == null)
 			throw new NotFoundException(username);
 

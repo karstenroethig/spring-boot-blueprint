@@ -21,5 +21,6 @@ public class AttributeNames
 	// Search
 	public static final String SEARCH_PARAMS = "searchParams";
 
+	public static final String CURRENT_USER = "currentUser";
 	public static final String USER = "user";
 }

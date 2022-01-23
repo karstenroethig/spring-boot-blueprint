@@ -1,5 +1,10 @@
 package karstenroethig.springbootblueprint.webapp.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,10 +13,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import karstenroethig.springbootblueprint.webapp.config.SecurityConfiguration.Authorities;
 import karstenroethig.springbootblueprint.webapp.model.domain.Authority;
 import karstenroethig.springbootblueprint.webapp.model.domain.User;
 import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
+import karstenroethig.springbootblueprint.webapp.repository.AuthorityRepository;
 import karstenroethig.springbootblueprint.webapp.repository.UserRepository;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.validation.ValidationException;
@@ -20,11 +27,12 @@ import karstenroethig.springbootblueprint.webapp.util.validation.ValidationResul
 @Service
 @Primary
 @Transactional
-public class OldUserServiceImpl
+public class UserServiceImpl
 {
 	@Autowired private PasswordEncoder passwordEncoder;
 
 	@Autowired protected UserRepository userRepository;
+	@Autowired private AuthorityRepository authorityRepository;
 
 	public OldUserDto create()
 	{
@@ -130,9 +138,14 @@ public class OldUserServiceImpl
 		return transformOld(userRepository.findById(id).orElse(null));
 	}
 
-	public OldUserDto find(String username)
+	public OldUserDto findOld(String username)
 	{
 		return transformOld(userRepository.findOneByEmailIgnoreCase(username).orElse(null));
+	}
+
+	public UserDto find(String username)
+	{
+		return transform(userRepository.findOneByEmailIgnoreCase(username).orElse(null));
 	}
 
 	protected User merge(User user, OldUserDto userDto)
@@ -218,6 +231,11 @@ public class OldUserServiceImpl
 		userDto.setEmail(user.getEmail());
 		userDto.setFullName(user.getFullName());
 
+		for (Authority authority : user.getAuthorities())
+		{
+			userDto.addAuthority(authority.getName());
+		}
+
 		return userDto;
 	}
 
@@ -227,5 +245,41 @@ public class OldUserServiceImpl
 			return null;
 
 		return userRepository.findById(userDto.getId()).orElse(null);
+	}
+
+	protected User mergeAuthorities(User user, UserDto userDto)
+	{
+		// delete unassigned authorities
+		List<Authority> previousAssignedAuthorities = new ArrayList<>(user.getAuthorities());
+		Set<String> alreadyAssignedAuthorityNames = new HashSet<>();
+		for (Authority authority : previousAssignedAuthorities)
+		{
+			if (userDto.getAuthorities().contains(authority.getName()) && Authorities.ALL_AUTHORITIES.contains(authority.getName()))
+				alreadyAssignedAuthorityNames.add(authority.getName());
+			else
+				user.removeAuthority(authority);
+		}
+
+		// add new assigned authorities
+		for (String authorityName : userDto.getAuthorities())
+		{
+			if (!alreadyAssignedAuthorityNames.contains(authorityName) && Authorities.ALL_AUTHORITIES.contains(authorityName))
+				user.addAuthority(findOrCreateAuthority(authorityName));
+		}
+
+		return user;
+	}
+
+	protected Authority findOrCreateAuthority(String name)
+	{
+		Authority authority = authorityRepository.findOneByNameIgnoreCase(name).orElse(null);
+
+		if (authority != null)
+			return authority;
+
+		authority = new Authority();
+		authority.setName(name);
+
+		return authorityRepository.save(authority);
 	}
 }

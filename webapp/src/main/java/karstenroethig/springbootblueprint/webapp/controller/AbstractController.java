@@ -22,7 +22,7 @@ import karstenroethig.springbootblueprint.webapp.controller.exceptions.Forbidden
 import karstenroethig.springbootblueprint.webapp.controller.exceptions.InternalServerErrorException;
 import karstenroethig.springbootblueprint.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.springbootblueprint.webapp.controller.util.AttributeNames;
-import karstenroethig.springbootblueprint.webapp.model.dto.OldUserDto;
+import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.Messages;
 import karstenroethig.springbootblueprint.webapp.util.validation.PropertyValidationMessage;
@@ -33,7 +33,7 @@ public abstract class AbstractController
 {
 	@Autowired private CurrentUserSessionBean currentUserBean;
 
-	protected OldUserDto getCurrentUser()
+	protected UserDto getCurrentUser()
 	{
 		return currentUserBean.getCurrentUser();
 	}

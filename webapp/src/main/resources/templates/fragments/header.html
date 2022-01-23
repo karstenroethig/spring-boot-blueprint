@@ -17,33 +17,22 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav me-auto" sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+				<ul class="navbar-nav me-auto">
 					<li class="nav-item">
 						<a class="nav-link" th:classappend="${#strings.equals(menu,'dashboard')} ? active"
 							th:href="@{/dashboard}" th:title="#{dashboard.label}"><em class="fas fa-home fa-lg"></em></a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:classappend="${#strings.equals(menu,'document')} ? active"
-							th:href="@{/document/list}" th:title="#{document.label.plural}"><em class="far fa-file-alt fa-lg"></em></a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:classappend="${#strings.equals(menu,'tag')} ? active"
-							th:href="@{/tag/list}" th:title="#{tag.label.plural}"><em class="fas fa-tags fa-lg"></em></a>
-					</li>
-					<li class="nav-item" sec:authorize="hasRole('USER') and !hasRole('ADMIN')">
-						<a class="nav-link" th:classappend="${#strings.equals(menu,'admin')} ? active"
-							th:href="@{/document-type/list}" th:title="#{admin.label}"><em class="fas fa-cog"></em></a>
-					</li>
+				</ul>
+				<ul class="navbar-nav ml-auto">
 					<li class="nav-item" sec:authorize="hasRole('ADMIN')">
 						<a class="nav-link" th:classappend="${#strings.equals(menu,'admin')} ? active"
 							th:href="@{/admin/server-info}" th:title="#{admin.label}"><em class="fas fa-cog"></em></a>
 					</li>
-				</ul>
-				<ul class="navbar-nav ml-auto">
 					<li class="nav-item dropdown" sec:authorize="isAuthenticated()">
 						<a href="#" class="nav-link dropdown-toggle" th:classappend="${#strings.equals(menu,'user')} ? active"
 							data-bs-toggle="dropdown"><em class="fas fa-user"></em></a>
 						<div class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+							<a href="#" class="dropdown-item disabled" th:text="${currentUser.fullName}">[currentUser.fullName]</a>
 							<a th:href="@{/user/show}" class="dropdown-item">User data</a>
 							<div class="dropdown-divider"></div>
 							<a th:href="@{/auth/logout}"class="dropdown-item">Logout</a>

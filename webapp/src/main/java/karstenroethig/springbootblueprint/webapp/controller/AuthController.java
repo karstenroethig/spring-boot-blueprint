@@ -12,8 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,9 +36,9 @@ import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserRegistrationDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserResetPasswordDto;
 import karstenroethig.springbootblueprint.webapp.model.dto.auth.UserTokenDto;
-import karstenroethig.springbootblueprint.webapp.service.impl.OldUserServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserRegistrationServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserResetPasswordServiceImpl;
+import karstenroethig.springbootblueprint.webapp.service.impl.UserServiceImpl;
 import karstenroethig.springbootblueprint.webapp.service.impl.UserTokenServiceImpl;
 import karstenroethig.springbootblueprint.webapp.util.MessageKeyEnum;
 import karstenroethig.springbootblueprint.webapp.util.Messages;
@@ -57,7 +55,7 @@ public class AuthController extends AbstractController
 	@Autowired private UserRegistrationServiceImpl userRegistrationService;
 	@Autowired private UserResetPasswordServiceImpl userResetPasswordService;
 	@Autowired private UserTokenServiceImpl userTokenService;
-	@Autowired private OldUserServiceImpl userService;
+	@Autowired private UserServiceImpl userService;
 
 	@GetMapping(value = "/login")
 	public String login(Model model, @RequestParam(name = "failed", defaultValue = "false") boolean failed, HttpServletRequest request)
@@ -233,31 +231,13 @@ public class AuthController extends AbstractController
 		}
 	}
 
-	@GetMapping(value = UrlMappings.CONTROLLER_USER + "/show")
-	public String show(Model model)
-	{
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null)
-			throw new NotFoundException("user not found");
-
-		String username = authentication.getName();
-		OldUserDto user = userService.find(username);
-		if (user == null)
-			throw new NotFoundException(username);
-
-		for (GrantedAuthority authority : SecurityContextHolder.getContext().getAuthentication().getAuthorities())
-			user.addSessionAuthority(authority.getAuthority());
-
-		model.addAttribute(AttributeNames.USER, user);
-
-		return ViewEnum.USER_SHOW.getViewName();
-	}
+	// FIXME: Deprecated at this point
 
 	@GetMapping(value = UrlMappings.CONTROLLER_USER + "/edit")
 	public String edit(Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto user = userService.find(username);
+		OldUserDto user = userService.findOld(username);
 		if (user == null)
 			throw new NotFoundException(username);
 
@@ -270,7 +250,7 @@ public class AuthController extends AbstractController
 		final RedirectAttributes redirectAttributes, Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto currentUser = userService.find(username);
+		OldUserDto currentUser = userService.findOld(username);
 		if (currentUser == null)
 			throw new NotFoundException(username);
 		user.setId(currentUser.getId());
@@ -296,7 +276,7 @@ public class AuthController extends AbstractController
 	public String delete(final RedirectAttributes redirectAttributes, Model model)
 	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		OldUserDto user = userService.find(username);
+		OldUserDto user = userService.findOld(username);
 		if (user == null)
 			throw new NotFoundException(username);
 

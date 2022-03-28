@@ -36,7 +36,7 @@
 		<app.name.pretty>Spring Boot Blueprint</app.name.pretty>
 		<app.name.files>spring-boot-blueprint</app.name.files>
 
-		<spring.boot.version>2.6.3</spring.boot.version>
+		<spring.boot.version>2.6.5</spring.boot.version>
 	</properties>
 
 	<dependencyManagement>
@@ -70,7 +70,7 @@
 			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>font-awesome</artifactId>
-				<version>5.15.4</version>
+				<version>6.1.0</version>
 			</dependency>
 			<dependency>
 				<!-- http://selectize.github.io/selectize.js -->
@@ -140,7 +140,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.3.0</version>
 				</plugin>
 
 				<plugin>
@@ -165,6 +165,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.10.1</version>
 					<configuration>
 						<release>${java.version}</release>
 						<source>${java.version}</source>
@@ -175,6 +176,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.2</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -204,7 +206,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.9.1</version>
+					<version>3.11.0</version>
 					<configuration>
 						<skip>true</skip>
 						<skipDeploy>true</skipDeploy>

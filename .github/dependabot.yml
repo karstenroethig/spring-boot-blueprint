@@ -9,7 +9,7 @@ updates:
 
   - package-ecosystem: "maven"
     directory: "/"
-    target-branch: "develop"
+    target-branch: "main"
     schedule:
       interval: "daily"
       time: "01:00"

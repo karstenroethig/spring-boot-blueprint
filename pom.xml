@@ -25,6 +25,10 @@
 		<module>distribution</module>
 	</modules>
 
+	<prerequisites>
+		<maven>3.8.4</maven>
+	</prerequisites>
+
 	<properties>
 		<java.version>17</java.version>
 
